@@ -1,5 +1,7 @@
 """Generate Markov text from text files."""
 from random import choice
+from sys import argv
+
 
 def open_and_read_file(file_path):
     """Take file path as string; return text as string.
@@ -13,7 +15,7 @@ def open_and_read_file(file_path):
         return file_string.read()
 
 
-def make_chains(text_string):
+def make_chains(text_string, n):
     """Take input text as string; return dictionary of Markov chains.
 
     A chain will be a key that consists of a tuple of (word1, word2)
@@ -24,7 +26,7 @@ def make_chains(text_string):
 
         >>> chains = make_chains("hi there mary hi there juanita")
 
-    Each bigram (except the last) will be a key in chains:
+    Each ngram (except the last) will be a key in chains:
 
         >>> sorted(chains.keys())
         [('hi', 'there'), ('mary', 'hi'), ('there', 'mary')]
@@ -33,7 +35,7 @@ def make_chains(text_string):
 
         >>> chains[('hi', 'there')]
         ['mary', 'juanita']
-        
+
         >>> chains[('there','juanita')]
         [None]
     """
@@ -43,18 +45,18 @@ def make_chains(text_string):
     words = text_string.split()
 
     # loop through each word in the text string
-    for i, word in enumerate(words[:-2]):
-        # create a tuple of the bigram of that word and the next word in the string
-            bigram = (word, words[i + 1])
+    for i, word in enumerate(words[:-n]):
+        # create a tuple of the ngram of that word and the next word in the string
+            ngram = tuple(words[i:i + n])
             # if that tuple is not in the dict
             # LOOK INTO: set default
-            if bigram not in chains:
+            if ngram not in chains:
                 # add as a key in the dict
-                # and the word following the bigram as a value for that key
-                chains[bigram] = [words[i + 2]]
-            # else add the word following the bigram as an additional value for the tuple
+                # and the word following the ngram as a value for that key
+                chains[ngram] = [words[i + n]]
+            # else add the word following the ngram as an additional value for the tuple
             else:
-                chains[bigram].append(words[i + 2])
+                chains[ngram].append(words[i + n])
 
     return chains
 
@@ -66,28 +68,28 @@ def make_text(chains):
 
     # your code goes here
     # find a random key
-    bigram = choice(chains.keys())
+    ngram = choice(chains.keys())
     # add to words list
-    words.extend(bigram)
-    while bigram in chains:
+    words.extend(ngram)
+    while ngram in chains:
         # attach the last value of the key to a value
-        random_value = choice(chains[bigram])
+        random_value = choice(chains[ngram])
         # add random value to words
         words.append(random_value)
         # assign that to a new key
-        bigram = (bigram[1], random_value)
+        ngram = (ngram[1], random_value)
         # repeat until finished
 
     return " ".join(words)
 
 
-input_path = "green-eggs.txt"
+input_path = argv[1]
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
 
 # Get a Markov chain
-chains = make_chains(input_text)
+chains = make_chains(input_text, int(argv[2]))
 
 # Produce random text
 random_text = make_text(chains)
