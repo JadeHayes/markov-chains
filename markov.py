@@ -51,12 +51,10 @@ def make_chains(text_string, n):
             # if that tuple is not in the dict
             # LOOK INTO: set default
             if ngram not in chains:
-                # add as a key in the dict
-                # and the word following the ngram as a value for that key
-                chains[ngram] = [words[i + n]]
-            # else add the word following the ngram as an additional value for the tuple
-            else:
-                chains[ngram].append(words[i + n])
+                # add as a key in the dict with an empty list as the value
+                chains[ngram] = []
+            # append the word following the ngram to the list that is the value for that ngram
+            chains[ngram].append(words[i + n])
 
     return chains
 
@@ -69,10 +67,18 @@ def make_text(chains, n):
     # your code goes here
     # find a random key
     ngram = choice(chains.keys())
+
+    # if the randomly selected key doesn't start with a capital letter
+    # keep picking new random keys until we find one that does
+    while ngram[0].istitle() is False:
+        ngram = choice(chains.keys())
+
     # add to words list
     words.extend(ngram)
 
-    while ngram in chains:
+    # if the last character if the ngram is not
+    # sentence-ending punctuation
+    while ngram[-1][-1] not in '!.?"' and ngram in chains:
         # attach the last value of the key to a value
         random_value = choice(chains[ngram])
         # add random value to words
@@ -85,14 +91,15 @@ def make_text(chains, n):
 
 
 input_path = argv[1]
+n = int(argv[2])
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
 
 # Get a Markov chain
-chains = make_chains(input_text, int(argv[2]))
+chains = make_chains(input_text, n)
 
 # Produce random text
-random_text = make_text(chains, int(argv[2]))
+random_text = make_text(chains, n)
 
 print random_text
