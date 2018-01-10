@@ -61,7 +61,7 @@ def make_chains(text_string, n):
     return chains
 
 
-def make_text(chains):
+def make_text(chains, n):
     """Return text from chains."""
 
     words = []
@@ -71,13 +71,14 @@ def make_text(chains):
     ngram = choice(chains.keys())
     # add to words list
     words.extend(ngram)
+
     while ngram in chains:
         # attach the last value of the key to a value
         random_value = choice(chains[ngram])
         # add random value to words
         words.append(random_value)
         # assign that to a new key
-        ngram = (ngram[1], random_value)
+        ngram = tuple(words[-n:])
         # repeat until finished
 
     return " ".join(words)
@@ -92,6 +93,6 @@ input_text = open_and_read_file(input_path)
 chains = make_chains(input_text, int(argv[2]))
 
 # Produce random text
-random_text = make_text(chains)
+random_text = make_text(chains, int(argv[2]))
 
 print random_text
