@@ -76,9 +76,7 @@ def make_text(chains, n):
     # add to words list
     words.extend(ngram)
 
-    # if the last character if the ngram is not
-    # sentence-ending punctuation
-    while ngram[-1][-1] not in '!.?"' and ngram in chains:
+    while ngram in chains:
         # attach the last value of the key to a value
         random_value = choice(chains[ngram])
         # add random value to words
@@ -87,14 +85,23 @@ def make_text(chains, n):
         ngram = tuple(words[-n:])
         # repeat until finished
 
-    return " ".join(words)
+    for i, word in enumerate(words[::-1]):
+        if word[-1] in '!.?"':
+            end_index = i
+
+    print end_index
+    return " ".join(words[:end_index])
 
 
-input_path = argv[1]
-n = int(argv[2])
+input_path1 = argv[1]
+#input_path2 = argv[2]
+#input_path3 = argv[3]
+n = int(argv[-1])
 
 # Open the file and turn it into one long string
-input_text = open_and_read_file(input_path)
+input_text = open_and_read_file(input_path1)
+# + open_and_read_file(input_path2)
+# + open_and_read_file(input_path3)
 
 # Get a Markov chain
 chains = make_chains(input_text, n)
